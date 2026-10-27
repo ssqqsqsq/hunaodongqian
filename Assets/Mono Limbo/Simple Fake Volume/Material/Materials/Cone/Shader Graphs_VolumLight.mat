@@ -52,8 +52,8 @@ Material:
     m_Ints: []
     m_Floats:
     - _Ambient_Occlusion: 0
-    - _Edg: -0.68
-    - _Edg_2: 0.76
+    - _Edg: -0.79
+    - _Edg_2: 0.9
     - _Emission: 0
     - _Extra_Noise: 0
     - _Extra_Noise_Density: 5
@@ -64,7 +64,7 @@ Material:
     - _Noise_A_Speed: 0.1
     - _Noise_B_Speed: 0.2
     - _Opacity: 0.1
-    - _Power: 0.5
+    - _Power: 0.99
     - _QueueControl: 0
     - _QueueOffset: 0
     - _Smoothness: 0
