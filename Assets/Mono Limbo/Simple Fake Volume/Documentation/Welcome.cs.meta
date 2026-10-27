@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 601a4ccb8b9057a48a0283175309e608
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {fileID: 2800000, guid: 7bb04f9ae5a58ea43928e01cc6bc496f, type: 3}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 323199
+  packageName: Easy Mesh Combiner + Mosaic Tool
+  packageVersion: 1.5
+  assetPath: Assets/Mono Limbo/Simple Fake Volume/Documentation/Welcome.cs
+  uploadId: 823812

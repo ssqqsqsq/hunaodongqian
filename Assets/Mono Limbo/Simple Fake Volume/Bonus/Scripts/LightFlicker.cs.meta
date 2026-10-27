@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: d4144428452c31843a84d459266f8212
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 299560
+  packageName: Simple Fake Volume Fog
+  packageVersion: 1.5
+  assetPath: Assets/Mono Limbo/Simple Fake Volume/Bonus/Scripts/LightFlicker.cs
+  uploadId: 823828

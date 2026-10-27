@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 902efc5965c76754581b2a5b48de8eb2
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects: {}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 625f186215c104763be7675aa2d941aa, type: 3}
+AssetOrigin:
+  serializedVersion: 1
+  productId: 299560
+  packageName: Simple Fake Volume Fog
+  packageVersion: 1.5
+  assetPath: Assets/Mono Limbo/Simple Fake Volume/Bonus/Shaders/Cool 1.shadergraph
+  uploadId: 823828

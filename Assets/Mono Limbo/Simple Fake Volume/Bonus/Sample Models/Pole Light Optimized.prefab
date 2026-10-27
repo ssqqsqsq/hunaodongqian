@@ -1,0 +1,171 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &4730698279412897893
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7269017723439669415}
+  m_Layer: 0
+  m_Name: Pole Light Optimized
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7269017723439669415
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4730698279412897893}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 8853832918204294093}
+  - {fileID: 2062893711266517072}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &4272484855475543365
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 7269017723439669415}
+    m_Modifications:
+    - target: {fileID: 2876169244489714965, guid: 37841d8aa4583414c840c798be4023d6, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2876169244489714965, guid: 37841d8aa4583414c840c798be4023d6, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.0039999485
+      objectReference: {fileID: 0}
+    - target: {fileID: 2876169244489714965, guid: 37841d8aa4583414c840c798be4023d6, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -0.13399994
+      objectReference: {fileID: 0}
+    - target: {fileID: 2876169244489714965, guid: 37841d8aa4583414c840c798be4023d6, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2876169244489714965, guid: 37841d8aa4583414c840c798be4023d6, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2876169244489714965, guid: 37841d8aa4583414c840c798be4023d6, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2876169244489714965, guid: 37841d8aa4583414c840c798be4023d6, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2876169244489714965, guid: 37841d8aa4583414c840c798be4023d6, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2876169244489714965, guid: 37841d8aa4583414c840c798be4023d6, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2876169244489714965, guid: 37841d8aa4583414c840c798be4023d6, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6422397031082556522, guid: 37841d8aa4583414c840c798be4023d6, type: 3}
+      propertyPath: m_Name
+      value: Volumetric Cone Light Optimized
+      objectReference: {fileID: 0}
+    - target: {fileID: 8291819298366976075, guid: 37841d8aa4583414c840c798be4023d6, type: 3}
+      propertyPath: m_Shadows.m_Type
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 37841d8aa4583414c840c798be4023d6, type: 3}
+--- !u!4 &2062893711266517072 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2876169244489714965, guid: 37841d8aa4583414c840c798be4023d6, type: 3}
+  m_PrefabInstance: {fileID: 4272484855475543365}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &9183108570743762576
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 7269017723439669415}
+    m_Modifications:
+    - target: {fileID: 409782169951325533, guid: 1893c9b448a70934e912124959ae3642, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 409782169951325533, guid: 1893c9b448a70934e912124959ae3642, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 409782169951325533, guid: 1893c9b448a70934e912124959ae3642, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 409782169951325533, guid: 1893c9b448a70934e912124959ae3642, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 409782169951325533, guid: 1893c9b448a70934e912124959ae3642, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 409782169951325533, guid: 1893c9b448a70934e912124959ae3642, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 409782169951325533, guid: 1893c9b448a70934e912124959ae3642, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 409782169951325533, guid: 1893c9b448a70934e912124959ae3642, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 409782169951325533, guid: 1893c9b448a70934e912124959ae3642, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 409782169951325533, guid: 1893c9b448a70934e912124959ae3642, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1532925048847864087, guid: 1893c9b448a70934e912124959ae3642, type: 3}
+      propertyPath: m_Name
+      value: Light Pole Lit
+      objectReference: {fileID: 0}
+    - target: {fileID: 4898560538537177252, guid: 1893c9b448a70934e912124959ae3642, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: ab80aa9498d9e7940b661ae9321a7d1a, type: 2}
+    - target: {fileID: 8535200253421986484, guid: 1893c9b448a70934e912124959ae3642, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: af95e7acf1191d442a54cb05216a7b33, type: 2}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 1893c9b448a70934e912124959ae3642, type: 3}
+--- !u!4 &8853832918204294093 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 409782169951325533, guid: 1893c9b448a70934e912124959ae3642, type: 3}
+  m_PrefabInstance: {fileID: 9183108570743762576}
+  m_PrefabAsset: {fileID: 0}

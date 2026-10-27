@@ -1,0 +1,15 @@
+Support & Contact
+General Questions: Reach out directly at monolimbostudio@gmail.com
+
+Bug Reports: When emailing, please include your current Unity version and the exact steps to reproduce the issue.
+
+Updates & Freebies: Check the Asset Store page regularly for new versions, and visit our publisher page for additional free assets!
+https://assetstore.unity.com/publishers/98904
+
+If this asset saves you time and helps your project, please consider leaving a review. It helps immensely!
+https://assetstore.unity.com/packages/vfx/shaders/simple-fake-volume-fog-299560#reviews 
+
+License Agreement
+Permitted: You are fully authorized to use this asset in both personal and commercial compiled projects.
+
+Restricted: You may not redistribute, repackage, or resell the original source files (Assets, Shaders, Materials, Scripts, etc.) under any circumstances.
