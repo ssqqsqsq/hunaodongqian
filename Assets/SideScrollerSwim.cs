@@ -2,6 +2,10 @@ using UnityEngine;
 
 public class SideScrollerSwim : MonoBehaviour
 {
+    [Header("冲刺")]
+    public float sprintSpeedMultiplier = 2f;
+    public float sprintForceMultiplier = 1.6f;
+    public bool IsSprinting { get; set; } = false;
     [Header("移动")]
     public float swimForce = 9f;
     public float maxSpeed = 6f;
@@ -57,14 +61,26 @@ public class SideScrollerSwim : MonoBehaviour
 
         if (moveDir.sqrMagnitude > 0.01f)
         {
-            rb.AddForce(new Vector3(moveDir.x, moveDir.y, 0f) * swimForce, ForceMode.Force);
+            // 根据是否冲刺，计算实际推力和最大速度
+            float effForce = swimForce * (IsSprinting ? sprintForceMultiplier : 1f);
+            float effMaxSpeed = maxSpeed * (IsSprinting ? sprintSpeedMultiplier : 1f);
+
+            rb.AddForce(new Vector3(moveDir.x, moveDir.y, 0f) * effForce, ForceMode.Force);
 
             Vector3 pv = new Vector3(rb.velocity.x, rb.velocity.y, 0f);
-            if (pv.magnitude > maxSpeed) pv = pv.normalized * maxSpeed;
+            if (pv.magnitude > effMaxSpeed) pv = pv.normalized * effMaxSpeed;
             rb.velocity = new Vector3(pv.x, pv.y, rb.velocity.z);
         }
 
         transform.position = new Vector3(rb.position.x, rb.position.y, 0f);
         rb.angularVelocity = new Vector3(0f, rb.angularVelocity.y, rb.angularVelocity.z);
     }
+    // ===== 新增查询输入的方法 =====
+    public bool HasMoveInput(float threshold = 0.05f)
+    {
+        float h = Input.GetAxisRaw("Horizontal");
+        float v = Input.GetAxisRaw("Vertical");
+        return Mathf.Abs(h) > threshold || Mathf.Abs(v) > threshold;
+    }
+    // ===============================
 }
