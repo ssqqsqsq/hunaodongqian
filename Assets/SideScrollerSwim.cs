@@ -1,16 +1,16 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 
 public class SideScrollerSwim : MonoBehaviour
 {
-    [Header("³å´Ì")]
+    [Header("å†²åˆº")]
     public float sprintSpeedMultiplier = 2f;
     public float sprintForceMultiplier = 1.6f;
     public bool IsSprinting { get; set; } = false;
-    [Header("ÒÆ¶¯")]
+    [Header("ç§»åŠ¨")]
     public float swimForce = 9f;
     public float maxSpeed = 6f;
 
-    [Header("×ªÏò")]
+    [Header("è½¬å‘")]
     public float rotateSpeed = 240f;
     public float rotationOffset = 90f;
     public float maxTilt = 80f;
@@ -51,7 +51,7 @@ public class SideScrollerSwim : MonoBehaviour
             tilt = Mathf.Clamp(tilt, -maxTilt, maxTilt);
 
             float yaw = facingSign > 0f ? 0f : 180f;
-            float z = rotationOffset - tilt;       // ¡û ¹Ø¼üÊÇÕâĞĞ
+            float z = rotationOffset - tilt;       // â† å…³é”®æ˜¯è¿™è¡Œ
             if (invertZ) z = -z;
 
             Quaternion target = Quaternion.Euler(0f, yaw, z);
@@ -61,7 +61,7 @@ public class SideScrollerSwim : MonoBehaviour
 
         if (moveDir.sqrMagnitude > 0.01f)
         {
-            // ¸ù¾İÊÇ·ñ³å´Ì£¬¼ÆËãÊµ¼ÊÍÆÁ¦ºÍ×î´óËÙ¶È
+            // æ ¹æ®æ˜¯å¦å†²åˆºï¼Œè®¡ç®—å®é™…æ¨åŠ›å’Œæœ€å¤§é€Ÿåº¦
             float effForce = swimForce * (IsSprinting ? sprintForceMultiplier : 1f);
             float effMaxSpeed = maxSpeed * (IsSprinting ? sprintSpeedMultiplier : 1f);
 
@@ -75,7 +75,7 @@ public class SideScrollerSwim : MonoBehaviour
         transform.position = new Vector3(rb.position.x, rb.position.y, 0f);
         rb.angularVelocity = new Vector3(0f, rb.angularVelocity.y, rb.angularVelocity.z);
     }
-    // ===== ĞÂÔö²éÑ¯ÊäÈëµÄ·½·¨ =====
+    // ===== æ–°å¢æŸ¥è¯¢è¾“å…¥çš„æ–¹æ³• =====
     public bool HasMoveInput(float threshold = 0.05f)
     {
         float h = Input.GetAxisRaw("Horizontal");
