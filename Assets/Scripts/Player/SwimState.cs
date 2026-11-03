@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.TextCore.Text;
 
 public class SwimState : BaseState
@@ -50,33 +50,10 @@ public class SwimState : BaseState
 
     public override void FixedUpdateState()
     {
-        // 转向逻辑
-        if (sm.HasMoveInput)
+        // 转向：按住右键跟鼠标，否则跟移动方向
+        if (sm.TryGetFacingDir(out Vector2 faceDir))
         {
-            Vector2 faceDir = new Vector2(
-                sm.flipAngle ? -sm.MoveDir.x : sm.MoveDir.x,
-                sm.MoveDir.y
-            );
-            if (faceDir.sqrMagnitude > 1f) faceDir.Normalize();
-
-            // 更新朝向翻转
-            Vector2 rel = new Vector2(faceDir.x * sm.facingSign, faceDir.y);
-            if (rel.x < -0.2f)
-                sm.facingSign = -sm.facingSign;
-
-            rel = new Vector2(faceDir.x * sm.facingSign, faceDir.y);
-            float tilt = Mathf.Atan2(rel.y, rel.x) * Mathf.Rad2Deg;
-            tilt = Mathf.Clamp(tilt, -sm.maxTilt, sm.maxTilt);
-
-            float yaw = sm.facingSign > 0f ? 0f : 180f;
-            float z = sm.rotationOffset - tilt;
-            if (sm.invertZ) z = -z;
-
-            Quaternion targetRot = Quaternion.Euler(0f, yaw, z);
-            sm.rb.rotation = Quaternion.RotateTowards(
-                sm.rb.rotation, targetRot,
-                sm.rotateSpeed * Time.fixedDeltaTime
-            );
+            sm.ApplyFacing(faceDir);
         }
 
         // 施加游动力

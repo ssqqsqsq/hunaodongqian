@@ -1,4 +1,5 @@
-﻿using UnityEngine.TextCore.Text;
+using UnityEngine;
+using UnityEngine.TextCore.Text;
 
 public class IdleState : BaseState
 {
@@ -38,7 +39,11 @@ public class IdleState : BaseState
 
     public override void FixedUpdateState()
     {
-        // 待机：不施加推力、不转向
+        // 待机不施加推力，但按住右键时仍然要跟着鼠标转身
+        if (sm.TryGetFacingDir(out Vector2 faceDir))
+        {
+            sm.ApplyFacing(faceDir);
+        }
     }
 
     public override void Exit()

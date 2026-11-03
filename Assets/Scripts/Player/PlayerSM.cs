@@ -22,6 +22,13 @@ public class PlayerSM : StateMachineBase
     public float sprintSpeedMultiplier = 2f;
     public float dashDuration = 0.25f;
 
+    [Header("鼠标瞄准")]
+    [Tooltip("留空则自动取 Camera.main")]
+    public Camera worldCamera;
+    public bool allowMouseAim = true;
+    [Tooltip("光标离角色多近时不再判定方向（世界单位）。约等于\"停到离光标多近\"")]
+    public float aimDeadZone = 0.5f;
+
     [Header("状态实例")]
     public IdleState idleState;
     public SwimState swimState;
@@ -37,7 +44,14 @@ public class PlayerSM : StateMachineBase
     public bool DashDown { get; private set; }
     public bool DashHeld { get; private set; }
     public bool IsDead { get; set; } = false;
+
+    // ---- 鼠标瞄准 ----
+    public bool AimHeld { get; private set; }        // 按住右键：朝向跟随鼠标
+    public bool MouseMoveHeld { get; private set; }  // 右键 + 左键：朝鼠标方向移动
+    public Vector2 AimDir { get; private set; }      // 世界空间、已归一化（Z 已消除）
+
     private BaseState currentState;
+    private Camera cachedCamera;
 
     private void Awake()
     {
@@ -74,11 +88,116 @@ public class PlayerSM : StateMachineBase
     //检测输入
     private void ReadInput()
     {
+        // 键盘方向
         float h = Input.GetAxisRaw("Horizontal");
         float v = Input.GetAxisRaw("Vertical");
-        MoveDir = new Vector2(h, v).normalized;
+        Vector2 keyboardDir = new Vector2(h, v).normalized;
+
+        // 鼠标：按住右键 = 瞄准（朝向跟鼠标）；再按住左键 = 朝鼠标移动
+        AimHeld = allowMouseAim && Input.GetMouseButton(1);
+        MouseMoveHeld = AimHeld && Input.GetMouseButton(0);
+        AimDir = AimHeld ? ReadAimDir() : Vector2.zero;
+
+        // 右键+左键时鼠标方向覆盖键盘方向，否则还是键盘
+        MoveDir = MouseMoveHeld && AimDir.sqrMagnitude > 0f ? AimDir : keyboardDir;
         HasMoveInput = MoveDir.sqrMagnitude > 0.05f;
+
         DashHeld = Input.GetKey(KeyCode.LeftShift);
+    }
+
+    // 世界空间里"角色 -> 鼠标"的单位方向；Z 已归零
+    private Vector2 ReadAimDir()
+    {
+        // 用私有缓存取 Camera.main，避免写回序列化字段把场景标记为脏
+        Camera cam = worldCamera != null ? worldCamera : cachedCamera;
+        if (cam == null)
+        {
+            cachedCamera = Camera.main;
+            cam = cachedCamera;
+        }
+
+        if (cam == null)
+        {
+            Debug.LogWarning("PlayerSM：找不到相机，鼠标瞄准不可用（可在 Inspector 上绑定 worldCamera）");
+            return Vector2.zero;
+        }
+
+        // 透视相机必须给一个深度，取相机到角色所在平面的距离
+        float depth = Mathf.Abs(transform.position.z - cam.transform.position.z);
+        if (depth < cam.nearClipPlane)
+        {
+            depth = cam.nearClipPlane + 0.01f;
+        }
+
+        Vector3 screenPoint = Input.mousePosition;
+        screenPoint.z = depth;
+        Vector3 worldPoint = cam.ScreenToWorldPoint(screenPoint);
+
+        Vector2 dir = new Vector2(
+            worldPoint.x - transform.position.x,
+            worldPoint.y - transform.position.y
+        );
+
+        // 光标压在角色身上时方向会剧烈抖动，直接忽略
+        if (dir.sqrMagnitude < aimDeadZone * aimDeadZone)
+        {
+            return Vector2.zero;
+        }
+
+        return dir.normalized;
+    }
+
+    // 当前该朝哪看：按住右键优先跟鼠标，否则跟移动方向
+    public bool TryGetFacingDir(out Vector2 dir)
+    {
+        if (AimHeld && AimDir.sqrMagnitude > 0f)
+        {
+            dir = AimDir;
+            return true;
+        }
+
+        if (HasMoveInput)
+        {
+            dir = MoveDir;
+            return true;
+        }
+
+        dir = Vector2.zero;
+        return false;
+    }
+
+    // 统一的转向逻辑：原来 SwimState / DashState 各复制了一份，现在收到这里
+    public void ApplyFacing(Vector2 dir)
+    {
+        if (dir.sqrMagnitude < 0.0001f)
+        {
+            return;
+        }
+
+        Vector2 faceDir = new Vector2(
+            flipAngle ? -dir.x : dir.x,
+            dir.y
+        );
+        if (faceDir.sqrMagnitude > 1f) faceDir.Normalize();
+
+        // 更新朝向翻转
+        Vector2 rel = new Vector2(faceDir.x * facingSign, faceDir.y);
+        if (rel.x < -0.2f)
+            facingSign = -facingSign;
+
+        rel = new Vector2(faceDir.x * facingSign, faceDir.y);
+        float tilt = Mathf.Atan2(rel.y, rel.x) * Mathf.Rad2Deg;
+        tilt = Mathf.Clamp(tilt, -maxTilt, maxTilt);
+
+        float yaw = facingSign > 0f ? 0f : 180f;
+        float z = rotationOffset - tilt;
+        if (invertZ) z = -z;
+
+        Quaternion targetRot = Quaternion.Euler(0f, yaw, z);
+        rb.rotation = Quaternion.RotateTowards(
+            rb.rotation, targetRot,
+            rotateSpeed * Time.fixedDeltaTime
+        );
     }
     // 切换状态
     public void SwitchState(BaseState next)

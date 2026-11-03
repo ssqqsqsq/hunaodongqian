@@ -12,18 +12,18 @@ public class DashState : BaseState
 
     public override void Enter()
     {
-        // 进入时给一小段初始冲量，起步顺滑，和你原来的手感对齐
-        Vector2 dashDir = sm.HasMoveInput
-            ? sm.MoveDir
-            : new Vector2(sm.rb.velocity.x, sm.rb.velocity.y).normalized;
+        //// 进入时给一小段初始冲量，起步顺滑，和你原来的手感对齐
+        //Vector2 dashDir = sm.HasMoveInput
+        //    ? sm.MoveDir
+        //    : new Vector2(sm.rb.velocity.x, sm.rb.velocity.y).normalized;
 
-        if (dashDir.sqrMagnitude < 0.01f)
-            dashDir = new Vector2(sm.facingSign, 0f);
+        //if (dashDir.sqrMagnitude < 0.01f)
+        //    dashDir = new Vector2(sm.facingSign, 0f);
 
-        sm.rb.AddForce(
-            new Vector3(dashDir.x, dashDir.y, 0f) * sm.swimForce * sm.sprintForceMultiplier * 0.5f,
-            ForceMode.Impulse
-        );
+        //sm.rb.AddForce(
+        //    new Vector3(dashDir.x, dashDir.y, 0f) * sm.swimForce * sm.sprintForceMultiplier * 0.5f,
+        //    ForceMode.Impulse
+        //);
     }
 
     public override void UpdateState()
@@ -62,32 +62,10 @@ public class DashState : BaseState
         float dashMaxSpeed = sm.maxSpeed * sm.sprintSpeedMultiplier;
         sm.ClampPlaneVelocity(dashMaxSpeed);
 
-        // 转向逻辑，和游泳完全一样，手感统一
-        if (sm.HasMoveInput)
+        // 转向逻辑，和游泳同源（按住右键跟鼠标，否则跟移动方向）
+        if (sm.TryGetFacingDir(out Vector2 faceDir))
         {
-            Vector2 faceDir = new Vector2(
-                sm.flipAngle ? -sm.MoveDir.x : sm.MoveDir.x,
-                sm.MoveDir.y
-            );
-            if (faceDir.sqrMagnitude > 1f) faceDir.Normalize();
-
-            Vector2 rel = new Vector2(faceDir.x * sm.facingSign, faceDir.y);
-            if (rel.x < -0.2f)
-                sm.facingSign = -sm.facingSign;
-
-            rel = new Vector2(faceDir.x * sm.facingSign, faceDir.y);
-            float tilt = Mathf.Atan2(rel.y, rel.x) * Mathf.Rad2Deg;
-            tilt = Mathf.Clamp(tilt, -sm.maxTilt, sm.maxTilt);
-
-            float yaw = sm.facingSign > 0f ? 0f : 180f;
-            float z = sm.rotationOffset - tilt;
-            if (sm.invertZ) z = -z;
-
-            Quaternion targetRot = Quaternion.Euler(0f, yaw, z);
-            sm.rb.rotation = Quaternion.RotateTowards(
-                sm.rb.rotation, targetRot,
-                sm.rotateSpeed * Time.fixedDeltaTime
-            );
+            sm.ApplyFacing(faceDir);
         }
     }
 
