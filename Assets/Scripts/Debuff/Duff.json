@@ -86,6 +86,7 @@
     {
       "id": 8,
       "name": "重度心率过快1",
+      "group": 1,
       "trigger": [0, 3, 135, 1],
       "obstime": 2,
       "gracetime": -1,
@@ -100,6 +101,7 @@
     {
       "id": 9,
       "name": "重度心率过快2",
+      "group": 1,
       "trigger": [0, 3, 135, 1],
       "obstime": 2,
       "gracetime": -1,

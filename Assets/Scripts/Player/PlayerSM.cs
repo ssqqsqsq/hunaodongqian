@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using UnityEngine;
 
 public class PlayerSM : StateMachineBase
@@ -43,6 +43,9 @@ public class PlayerSM : StateMachineBase
     public bool HasMoveInput { get; private set; }
     public bool DashDown { get; private set; }
     public bool DashHeld { get; private set; }
+
+    // Debuff「强制疾跑」：等价于一直按住 Shift（由 DebuffManager 设置）
+    public bool ForceSprint { get; set; }
     public bool IsDead { get; set; } = false;
 
     // ---- 鼠标瞄准 ----
@@ -102,7 +105,7 @@ public class PlayerSM : StateMachineBase
         MoveDir = MouseMoveHeld && AimDir.sqrMagnitude > 0f ? AimDir : keyboardDir;
         HasMoveInput = MoveDir.sqrMagnitude > 0.05f;
 
-        DashHeld = Input.GetKey(KeyCode.LeftShift);
+        DashHeld = Input.GetKey(KeyCode.LeftShift) || ForceSprint;
     }
 
     // 世界空间里"角色 -> 鼠标"的单位方向；Z 已归零

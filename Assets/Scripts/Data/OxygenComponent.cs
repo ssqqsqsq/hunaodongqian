@@ -4,10 +4,10 @@ using UnityEngine;
 public class OxygenComponent : MonoBehaviour
 {
     [Header("氧气配置")]
-    [SerializeField] private float maxOxygen = 180f; // 单瓶最大氧气值
-    [SerializeField] private float oxygenDepletionRate = 1f; // 待机状态下氧气消耗速率（每秒）
-    [SerializeField] private float oxygenDepletionRateMoving = 2f; // 移动状态下氧气消耗速率（每秒）
-    [SerializeField] private float oxygenDepletionRateDashing = 4f; // 冲刺状态下氧气消耗速率（每秒）
+    [SerializeField] private float maxOxygen = 1800f; // 单瓶最大氧气值
+    [SerializeField] private float oxygenDepletionRate = 10f; // 待机状态下氧气消耗速率（每秒）
+    [SerializeField] private float oxygenDepletionRateMoving = 20f; // 移动状态下氧气消耗速率（每秒）
+    [SerializeField] private float oxygenDepletionRateDashing = 40f; // 冲刺状态下氧气消耗速率（每秒）
     [SerializeField] public bool HasAirTank = true; // 是否还有一瓶未使用的备用气瓶
 
     [Header("事件节流")]
@@ -16,7 +16,7 @@ public class OxygenComponent : MonoBehaviour
     public float CurrentOxygen { get; private set; } // 当前气瓶剩余氧气值
     public bool IsOxygenEmpty { get; private set; } // 是否已经彻底没气
     public float TotalOxygen { get; private set; } // 剩余总气量（当前瓶 + 备用瓶）
-    public float CurrentOxygenDepletionRate { get; private set; } // 当前氧气消耗速率
+    public float CurrentOxygenDepletionRate { get; private set; } // 当前氧气消耗速率（已含 Debuff 偏移）
     public float TotalOxygenConsumed; // 累计消耗的氧气总量（不清零）
 
     public event Action<float> OnOxygenChanged; // 氧气值变化，已按 changeEventInterval 节流
@@ -24,6 +24,10 @@ public class OxygenComponent : MonoBehaviour
     public event Action OnAirSupplyExhausted; // 彻底没气（此时会调用 Kill）
 
     private PlayerSM SM;
+
+    // 状态决定的基准速率，以及 Debuff 叠加的偏移
+    private float stateDepletionRate;
+    private float debuffRateOffset;
 
     // 距上次广播累计的时间，用于节流
     private float changeEventTimer;
@@ -38,7 +42,8 @@ public class OxygenComponent : MonoBehaviour
             Debug.LogError("OxygenComponent：同物体上找不到 PlayerSM，死亡与状态相关的逻辑将失效！");
         }
 
-        CurrentOxygenDepletionRate = oxygenDepletionRate;
+        stateDepletionRate = oxygenDepletionRate;
+        RefreshDepletionRate();
 
         RefreshTotalOxygen();
     }
@@ -126,19 +131,34 @@ public class OxygenComponent : MonoBehaviour
     {
         if (newState == SM.idleState)
         {
-            CurrentOxygenDepletionRate = oxygenDepletionRate;
+            stateDepletionRate = oxygenDepletionRate;
         }
         else if (newState == SM.swimState)
         {
-            CurrentOxygenDepletionRate = oxygenDepletionRateMoving;
+            stateDepletionRate = oxygenDepletionRateMoving;
         }
         else if (newState == SM.dashState)
         {
-            CurrentOxygenDepletionRate = oxygenDepletionRateDashing;
+            stateDepletionRate = oxygenDepletionRateDashing;
         }
         else if (newState == SM.deathState)
         {
-            CurrentOxygenDepletionRate = 0f;
+            stateDepletionRate = 0f;
         }
+
+        RefreshDepletionRate();
+    }
+
+    // Debuff 对消耗速率的叠加（可为负）
+    public void AddDebuffRateOffset(float offset)
+    {
+        debuffRateOffset += offset;
+        RefreshDepletionRate();
+    }
+
+    // 实际速率 = 状态基准 + Debuff 偏移，不允许为负（负速率不当作回气用）
+    private void RefreshDepletionRate()
+    {
+        CurrentOxygenDepletionRate = Mathf.Max(0f, stateDepletionRate + debuffRateOffset);
     }
 }

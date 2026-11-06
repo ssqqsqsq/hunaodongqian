@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.ComponentModel;
 using Newtonsoft.Json;
 using UnityEngine;
@@ -92,6 +92,7 @@ public class DebuffConfigLoader : MonoBehaviour
             id = raw.id,
             name = raw.name,
             nameForGame = raw.nameForGame,
+            group = raw.group,
             trigger = trigger,
             observeTime = DebuffScale.TimeFromTable(raw.obstime),
             graceTime = DebuffScale.TimeFromTable(raw.gracetime),
@@ -110,56 +111,75 @@ public class DebuffConfigLoader : MonoBehaviour
         return cfg;
     }
 
+    // trigger 的第一个整数是操作类型，先按类型分派，再校验该类型的长度
     static TriggerCondition ToTrigger(RawDebuff raw)
     {
         int[] t = raw.trigger;
-        if (t == null || t.Length < 3)
+        if (t == null || t.Length < 2)
         {
-            Debug.LogError($"DebuffConfigLoader：Debuff[{raw.id}] 的 trigger 长度不足（需要 3 或 4 个 int）");
+            Debug.LogError($"DebuffConfigLoader：Debuff[{raw.id}] 的 trigger 至少需要 2 个整数");
             return null;
         }
 
-        int attribute;
-        int thresholdRaw;
-        int operatorRaw;
-
-        if (t.Length >= 4)
+        switch (t[0])
         {
-            int opType = t[0];
-            if (opType == 1)
+            // 数值比对：0 Tag 阈值 运算符
+            case 0:
             {
-                Debug.LogError($"DebuffConfigLoader：Debuff[{raw.id}] 使用了操作类型1（flag），暂不支持，跳过");
-                return null;
+                if (t.Length != 4)
+                {
+                    Debug.LogError($"DebuffConfigLoader：Debuff[{raw.id}] 数值型 trigger 需要 4 个整数 [0,Tag,阈值,运算符]，实际 {t.Length} 个");
+                    return null;
+                }
+
+                var attributeType = (DataType)t[1];
+                if (!AttributeDomain.IsDefined(attributeType))
+                {
+                    Debug.LogError($"DebuffConfigLoader：Debuff[{raw.id}] 触发属性 {t[1]} 未定义");
+                    return null;
+                }
+
+                if (!System.Enum.IsDefined(typeof(TriggerOperator), t[3]))
+                {
+                    Debug.LogError($"DebuffConfigLoader：Debuff[{raw.id}] 运算符 {t[3]} 未定义（1大 2小 3等于 4大于等于 5小于等于 6不等于）");
+                    return null;
+                }
+
+                return new TriggerCondition
+                {
+                    kind = TriggerKind.Numeric,
+                    attribute = attributeType,
+                    threshold = t[2],
+                    op = (TriggerOperator)t[3],
+                };
             }
-            if (opType != 0)
+
+            // flag为真：1 flagNum
+            case 1:
             {
-                Debug.LogError($"DebuffConfigLoader：Debuff[{raw.id}] 的触发操作类型 {opType} 未定义");
-                return null;
+                if (t.Length != 2)
+                {
+                    Debug.LogError($"DebuffConfigLoader：Debuff[{raw.id}] flag型 trigger 需要 2 个整数 [1,flagNum]，实际 {t.Length} 个");
+                    return null;
+                }
+
+                if (!FlagTable.IsValidIndex(t[1]))
+                {
+                    Debug.LogError($"DebuffConfigLoader：Debuff[{raw.id}] flagNum={t[1]} 超出 flag 表范围（{FlagTable.MinIndex}..{FlagTable.MaxIndex}）");
+                    return null;
+                }
+
+                return new TriggerCondition
+                {
+                    kind = TriggerKind.Flag,
+                    flagNum = t[1],
+                };
             }
-            attribute = t[1];
-            thresholdRaw = t[2];
-            operatorRaw = t[3];
-        }
-        else
-        {
-            attribute = t[0];
-            thresholdRaw = t[1];
-            operatorRaw = t[2];
-        }
 
-        var attributeType = (DataType)attribute;
-        if (!AttributeDomain.IsDefined(attributeType))
-        {
-            Debug.LogError($"DebuffConfigLoader：Debuff[{raw.id}] 触发属性 {attribute} 未定义");
-            return null;
+            default:
+                Debug.LogError($"DebuffConfigLoader：Debuff[{raw.id}] 的触发操作类型 {t[0]} 未定义（0数值比对 / 1flag为真）");
+                return null;
         }
-
-        return new TriggerCondition
-        {
-            attribute = attributeType,
-            threshold = DebuffScale.ValueFromTable(attributeType, thresholdRaw),
-            op = (TriggerOperator)operatorRaw,
-        };
     }
 
     static EffectSpec ToEffect(int debuffId, int[] raw)
@@ -170,21 +190,40 @@ public class DebuffConfigLoader : MonoBehaviour
             return null;
         }
 
+        if (!System.Enum.IsDefined(typeof(EffectTag), raw[0]))
+        {
+            Debug.LogError($"DebuffConfigLoader：Debuff[{debuffId}] 效果类型 {raw[0]} 未定义，跳过该效果");
+            return null;
+        }
+
         var spec = new EffectSpec
         {
             tag = (EffectTag)raw[0],
         };
 
+        if (spec.tag == EffectTag.Unknown)
+        {
+            Debug.LogError($"DebuffConfigLoader：Debuff[{debuffId}] 效果类型 0（Unknown）无意义，跳过该效果");
+            return null;
+        }
+
         if (spec.tag == EffectTag.ValueChange)
         {
-            if (raw.Length < 3)
+            if (raw.Length != 3)
             {
-                Debug.LogError($"DebuffConfigLoader：Debuff[{debuffId}] 数值变化格式错误，需要 [4,属性,增量]");
+                Debug.LogError($"DebuffConfigLoader：Debuff[{debuffId}] 数值变化格式错误，需要 [4,属性,增量]，实际 {raw.Length} 个");
                 return null;
             }
+
             var attribute = (DataType)raw[1];
+            if (!AttributeDomain.IsDefined(attribute))
+            {
+                Debug.LogError($"DebuffConfigLoader：Debuff[{debuffId}] 数值变化的目标属性 {raw[1]} 未定义");
+                return null;
+            }
+
             spec.attribute = attribute;
-            spec.operands = new[] { DebuffScale.ValueFromTable(attribute, raw[2]) };
+            spec.operands = new[] { (float)raw[2] };
             return spec;
         }
 
@@ -192,7 +231,7 @@ public class DebuffConfigLoader : MonoBehaviour
         {
             var operands = new float[raw.Length - 1];
             for (int i = 1; i < raw.Length; i++)
-                operands[i - 1] = DebuffScale.OperandFromTable(raw[i]);
+                operands[i - 1] = raw[i];
             spec.operands = operands;
         }
         return spec;
@@ -204,6 +243,7 @@ public class DebuffConfigLoader : MonoBehaviour
         public int id;
         public string name;
         public string nameForGame;
+        public int group;
         public int[] trigger;
         public int obstime;
         public int gracetime;

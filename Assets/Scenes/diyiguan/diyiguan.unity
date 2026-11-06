@@ -2586,7 +2586,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   configFile: {fileID: 4900000, guid: 2a1ab942890ad694ea760d5451eabddc, type: 3}
-  validateOnLoad: 1
 --- !u!1 &294113060
 GameObject:
   m_ObjectHideFlags: 0
@@ -18436,6 +18435,37 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1634487295}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &1644022089
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1644022090}
+  m_Layer: 0
+  m_Name: SpawnPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1644022090
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1644022089}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -31.592499, y: 28.739998, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1646503801
 GameObject:
   m_ObjectHideFlags: 0
@@ -19876,12 +19906,13 @@ GameObject:
   - component: {fileID: 1799796983}
   - component: {fileID: 1799796980}
   - component: {fileID: 1799796987}
-  - component: {fileID: 1799796993}
-  - component: {fileID: 1799796992}
   - component: {fileID: 1799796991}
+  - component: {fileID: 1799796997}
+  - component: {fileID: 1799796996}
+  - component: {fileID: 1799796995}
   - component: {fileID: 1799796990}
-  - component: {fileID: 1799796989}
   - component: {fileID: 1799796988}
+  - component: {fileID: 1799796994}
   m_Layer: 0
   m_Name: body
   m_TagString: Untagged
@@ -20026,7 +20057,7 @@ MonoBehaviour:
   sprintForceMultiplier: 1
   sprintSpeedMultiplier: 2
   dashDuration: 0.25
-  worldCamera: {fileID: 0}
+  worldCamera: {fileID: 1599267861}
   allowMouseAim: 1
   aimDeadZone: 0.5
   rb: {fileID: 0}
@@ -20043,31 +20074,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 290f15c0edae86c4ab5e69ebab4c33d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  oxygenComponent: {fileID: 1799796993}
-  nitrogenComponent: {fileID: 1799796992}
-  carbonDioxideComponent: {fileID: 1799796989}
+  oxygenComponent: {fileID: 1799796995}
+  nitrogenComponent: {fileID: 1799796997}
+  carbonDioxideComponent: {fileID: 1799796996}
   depthComponent: {fileID: 1799796990}
   playerSM: {fileID: 1799796987}
   heartRateComponent: {fileID: 1799796991}
---- !u!114 &1799796989
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1799796979}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8d83cd04c79c4bb419bc7c93facca908, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  maxCarbonDioxide: 30
-  minCarbonDioxide: 0
-  hypercapniaThreshold: 20
-  deathChangeRate: -100
-  idleChangeRate: -2
-  swimChangeRate: -1
-  dashChangeRate: 1
 --- !u!114 &1799796990
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -20080,8 +20092,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 378c4627372c8434fbd8daa90b674041, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  surfaceY: 10
   depthChangeThreshold: 0.5
+  spawnPoint: {fileID: 1644022089}
 --- !u!114 &1799796991
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -20101,8 +20113,66 @@ MonoBehaviour:
   deathOffset: -180
   fluctuationRange: 2
   fluctuationSpeed: 0.5
-  SM: {fileID: 0}
---- !u!114 &1799796992
+  SM: {fileID: 1799796987}
+--- !u!114 &1799796994
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1799796979}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dd03873b0117c0f4bb7fce654e3108b2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  configLoader: {fileID: 276792495}
+  dataManager: {fileID: 0}
+  playerSM: {fileID: 0}
+  heartRate: {fileID: 0}
+  oxygen: {fileID: 0}
+  carbonDioxide: {fileID: 0}
+  nitrogen: {fileID: 0}
+  logStateChange: 0
+--- !u!114 &1799796995
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1799796979}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b5c24fe01fe616941bac6ca6ab20e92c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxOxygen: 1800
+  oxygenDepletionRate: 10
+  oxygenDepletionRateMoving: 20
+  oxygenDepletionRateDashing: 40
+  HasAirTank: 1
+  changeEventInterval: 0.1
+  TotalOxygenConsumed: 0
+--- !u!114 &1799796996
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1799796979}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8d83cd04c79c4bb419bc7c93facca908, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxCarbonDioxide: 300
+  minCarbonDioxide: 0
+  hypercapniaThreshold: 200
+  deathChangeRate: -1000
+  idleChangeRate: -20
+  swimChangeRate: -10
+  dashChangeRate: 10
+--- !u!114 &1799796997
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -20118,25 +20188,6 @@ MonoBehaviour:
   minNitrogenNarcosis: 0
   hyperThreshold: 20
   baseChangeRate: -1
---- !u!114 &1799796993
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1799796979}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b5c24fe01fe616941bac6ca6ab20e92c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  maxOxygen: 180
-  oxygenDepletionRate: 1
-  oxygenDepletionRateMoving: 2
-  oxygenDepletionRateDashing: 4
-  HasAirTank: 1
-  changeEventInterval: 0.1
-  TotalOxygenConsumed: 0
 --- !u!1 &1816800522
 GameObject:
   m_ObjectHideFlags: 0
@@ -23886,3 +23937,4 @@ SceneRoots:
   - {fileID: 993871273}
   - {fileID: 789835154}
   - {fileID: 1999098775}
+  - {fileID: 1644022090}

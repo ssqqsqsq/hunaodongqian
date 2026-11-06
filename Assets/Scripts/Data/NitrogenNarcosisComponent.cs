@@ -1,4 +1,3 @@
-﻿
 using System;
 using UnityEngine;
 
@@ -15,15 +14,14 @@ public class NitrogenNarcosisComponent : MonoBehaviour
     // 当前氮醉值
     public float CurrentNitrogenNarcosis { get; private set; }
 
-    // 当前氮醉值变化速率
+    // 当前氮醉值变化速率（已含 Debuff 偏移）
     public float CurrentChangeRate { get; private set; }
 
- 
+    // Debuff 叠加的偏移
+    private float debuffRateOffset;
 
     // 氮醉值变化事件
     public event Action<float> OnNitrogenNarcosisChanged;
-
-  
 
     private void Awake()
     {
@@ -59,9 +57,12 @@ public class NitrogenNarcosisComponent : MonoBehaviour
         {
             OnNitrogenNarcosisChanged?.Invoke(CurrentNitrogenNarcosis);
         }
-
-     
     }
 
-
+    // Debuff 对变化速率的叠加（可为负）
+    public void AddDebuffRateOffset(float offset)
+    {
+        debuffRateOffset += offset;
+        CurrentChangeRate = baseChangeRate + debuffRateOffset;
+    }
 }

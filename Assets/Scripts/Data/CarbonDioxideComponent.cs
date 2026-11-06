@@ -1,31 +1,32 @@
-﻿
 using System;
 using UnityEngine;
 
 public class CarbonDioxideComponent : MonoBehaviour
 {
     [Header("碳酸值配置")]
-    [SerializeField] private float maxCarbonDioxide = 30f;
+    [SerializeField] private float maxCarbonDioxide = 300f;
     [SerializeField] private float minCarbonDioxide = 0f;
-    [SerializeField] private float hypercapniaThreshold = 20f;
+    [SerializeField] private float hypercapniaThreshold = 200f;
 
     [Header("碳酸值变化速率")]
-    [SerializeField] private float deathChangeRate = -100f;
-    [SerializeField] private float idleChangeRate = -2f;
-    [SerializeField] private float swimChangeRate = -1f;
-    [SerializeField] private float dashChangeRate = 1f;
+    [SerializeField] private float deathChangeRate = -1000f;
+    [SerializeField] private float idleChangeRate = -20f;
+    [SerializeField] private float swimChangeRate = -10f;
+    [SerializeField] private float dashChangeRate = 10f;
 
     // 当前碳酸值
     public float CurrentCarbonDioxide { get; private set; }
 
-    // 当前碳酸值变化速率
+    // 当前碳酸值变化速率（已含 Debuff 偏移）
     public float CurrentChangeRate { get; private set; }
 
 
     // 碳酸值变化事件
     public event Action<float> OnCarbonDioxideChanged;
 
-
+    // 状态决定的基准速率，以及 Debuff 叠加的偏移
+    private float stateChangeRate;
+    private float debuffRateOffset;
 
     private PlayerSM SM;
 
@@ -35,7 +36,8 @@ public class CarbonDioxideComponent : MonoBehaviour
 
         SM = GetComponent<PlayerSM>();
 
-        CurrentChangeRate = idleChangeRate;
+        stateChangeRate = idleChangeRate;
+        RefreshChangeRate();
     }
 
     private void OnEnable()
@@ -86,21 +88,33 @@ public class CarbonDioxideComponent : MonoBehaviour
     {
         if (newState == SM.deathState)
         {
-            CurrentChangeRate = deathChangeRate;
+            stateChangeRate = deathChangeRate;
         }
         else if (newState == SM.idleState)
         {
-            CurrentChangeRate = idleChangeRate;
+            stateChangeRate = idleChangeRate;
         }
         else if (newState == SM.swimState)
         {
-            CurrentChangeRate = swimChangeRate;
+            stateChangeRate = swimChangeRate;
         }
         else if (newState == SM.dashState)
         {
-            CurrentChangeRate = dashChangeRate;
+            stateChangeRate = dashChangeRate;
         }
+
+        RefreshChangeRate();
     }
 
+    // Debuff 对变化速率的叠加（可为负）
+    public void AddDebuffRateOffset(float offset)
+    {
+        debuffRateOffset += offset;
+        RefreshChangeRate();
+    }
 
+    private void RefreshChangeRate()
+    {
+        CurrentChangeRate = stateChangeRate + debuffRateOffset;
+    }
 }

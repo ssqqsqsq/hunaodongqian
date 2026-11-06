@@ -4,9 +4,9 @@ using System;
 public class DepthComponent : MonoBehaviour
 {
     [Header("深度配置")]
-    [SerializeField] private float surfaceY = 10f;
+    
     [SerializeField] private float depthChangeThreshold = 0.5f;
-
+    [SerializeField] private GameObject spawnPoint;
     // 当前深度
     public float CurrentDepth { get; private set; }
 
@@ -21,7 +21,7 @@ public class DepthComponent : MonoBehaviour
     private void UpdateDepth()
     {
         // 计算当前深度
-        float newDepth = Mathf.Max(0f, surfaceY - transform.position.y);
+        float newDepth = Mathf.Max(0f, spawnPoint.transform.position.y - transform.position.y);
 
         // 判断深度变化是否达到阈值
         if (Mathf.Abs(newDepth - CurrentDepth) >= depthChangeThreshold)
