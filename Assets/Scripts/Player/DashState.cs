@@ -35,22 +35,30 @@ public class DashState : BaseState
             return;
         }
 
-        // 松开Shift就退出冲刺
+        // 没有移动 → 静止（按住 Shift 也不冲刺）
+        if (!sm.HasMoveInput)
+        {
+            sm.SwitchState(sm.idleState);
+            return;
+        }
+
+        // 松开 Shift → 回到游泳
         if (!sm.DashHeld)
         {
-            sm.SwitchState(sm.HasMoveInput ? sm.swimState : sm.idleState);
+            sm.SwitchState(sm.swimState);
             return;
         }
     }
 
     public override void FixedUpdateState()
     {
-        // 持续推力，和原版逻辑一致
+        // 持续推力，和原版逻辑一致（漂移生效时用漂移方向）
         if (sm.HasMoveInput)
         {
+            Vector2 eff = sm.GetEffectiveMoveDir();
             Vector2 moveDir = new Vector2(
-                sm.flipMove ? -sm.MoveDir.x : sm.MoveDir.x,
-                sm.MoveDir.y
+                sm.flipMove ? -eff.x : eff.x,
+                eff.y
             );
             if (moveDir.sqrMagnitude > 1f) moveDir.Normalize();
 

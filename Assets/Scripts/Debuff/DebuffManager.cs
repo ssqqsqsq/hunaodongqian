@@ -278,16 +278,35 @@ public class DebuffManager : MonoBehaviour
         rt.phase = DebuffPhase.Inactive;
         rt.timer = 0f;
 
+        bool wasApplied = rt.applied;
         if (rt.applied)
         {
             rt.applied = false;
             ApplyAll(rt, false);
         }
 
+        // 突发事件（flag 触发的 debuff）被解决后 → 触发「心有余悸」（flag5=1）
+        if (wasApplied) TriggerResidualFear(rt.config);
+
         if (logStateChange)
             Debug.Log($"Debuff 解除：[{rt.config.id}] {rt.config.name}");
 
         OnDebuffHealed?.Invoke(rt.config);
+    }
+
+    // 突发事件解决（不再满足 trigger）后触发「心有余悸」：把 flag5 置真，由 flag[1,5] 的 debuff 接手。
+    // 心有余悸自身（触发的 flag 就是 5）不参与，避免自我循环。
+    private void TriggerResidualFear(DebuffConfig cfg)
+    {
+        TriggerCondition t = cfg.trigger;
+        if (t == null || t.kind != TriggerKind.Flag) return;
+        if (t.flagNum == 5) return;
+
+        if (!Flags.IsTrue(5))
+        {
+            SetFlag(5, true);
+            if (logStateChange) Debug.Log("[心有余悸] 突发事件解决 → flag5=1");
+        }
     }
 
     private void ApplyAll(Runtime rt, bool apply)
@@ -329,19 +348,10 @@ public class DebuffManager : MonoBehaviour
 
         if (e.tag != EffectTag.ValueChange)
         {
-            // 屏幕/操作类效果还没有接收方，先抛事件
-            if (apply)
-            {
-                OnEffectApplied?.Invoke(cfg, e);
-
-                int key = cfg.id * 100 + (int)e.tag;
-                if (warnedEffects.Add(key))
-                    Debug.LogWarning($"DebuffManager：效果 {e.tag}（Debuff[{cfg.id}]）暂无接收方，已通过 OnEffectApplied 抛出");
-            }
-            else
-            {
-                OnEffectRemoved?.Invoke(cfg, e);
-            }
+            // 视觉/操作类效果交给 EffectController 处理（屏幕昏暗/扭曲/暂留/闪烁、
+            // 数值显示错误、操作延迟/反向/随机偏移等），这里只负责把施加/解除广播出去。
+            if (apply) OnEffectApplied?.Invoke(cfg, e);
+            else OnEffectRemoved?.Invoke(cfg, e);
             return;
         }
 

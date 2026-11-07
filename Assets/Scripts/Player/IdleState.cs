@@ -23,17 +23,10 @@ public class IdleState : BaseState
             return;
         }
 
-        // 按住Shift直接进入冲刺
-        if (sm.DashHeld)
-        {
-            sm.SwitchState(sm.dashState);
-            return;
-        }
-
-        // 有移动输入，切游泳
+        // 只有移动时才切换；没移动就保持静止（按住 Shift 没动不进入冲刺）
         if (sm.HasMoveInput)
         {
-            sm.SwitchState(sm.swimState);
+            sm.SwitchState(sm.DashHeld ? sm.dashState : sm.swimState);
         }
     }
 

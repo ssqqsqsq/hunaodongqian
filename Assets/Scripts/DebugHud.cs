@@ -25,6 +25,7 @@ public class DebugHud : MonoBehaviour
 
     private DebuffManager manager;
     private DebuffConfigLoader loader;
+    private EffectController effects;
     private PlayerSM player;
     private HeartRateComponent heart;
     private CarbonDioxideComponent co2;
@@ -155,6 +156,7 @@ public class DebugHud : MonoBehaviour
 
         manager = FindFirstObjectByType<DebuffManager>();
         loader = FindFirstObjectByType<DebuffConfigLoader>();
+        effects = FindFirstObjectByType<EffectController>();
 
         player.OnStateChanged += OnPlayerStateChanged;
     }
@@ -209,7 +211,12 @@ public class DebugHud : MonoBehaviour
 
     private void AppendAttributes()
     {
-        sb.Append($"{"心率",-6}{(heart != null ? heart.CurrentHeartRate : 0f),7:0.0} bpm\n");
+        // 效果5 数值显示错误：气体、心率的“显示值”在 ±20 内乱跳（真实数值不变）
+        bool glitch = effects != null && effects.IsValueGlitchActive;
+
+        float hr = heart != null ? heart.CurrentHeartRate : 0f;
+        if (glitch) hr += Random.Range(-20f, 20f);
+        sb.Append($"{"心率",-6}{hr,7:0.0} bpm\n");
 
         sb.Append($"{"碳酸",-6}{(co2 != null ? co2.CurrentCarbonDioxide : 0f),7:0.0} / 30");
         sb.Append($"    速率 {SRate(co2 != null ? co2.CurrentChangeRate : 0f)}\n");
@@ -221,8 +228,16 @@ public class DebugHud : MonoBehaviour
 
         if (oxygen != null)
         {
-            sb.Append($"{"总气量",-6}{oxygen.TotalOxygen,7:0.0}");
-            sb.Append($"    本瓶 {oxygen.CurrentOxygen:0.0}    消耗 {oxygen.CurrentOxygenDepletionRate:0.00}/s");
+            float total = oxygen.TotalOxygen;
+            float current = oxygen.CurrentOxygen;
+            if (glitch)
+            {
+                total += Random.Range(-20f, 20f);
+                current += Random.Range(-20f, 20f);
+            }
+
+            sb.Append($"{"总气量",-6}{total,7:0.0}");
+            sb.Append($"    本瓶 {current:0.0}    消耗 {oxygen.CurrentOxygenDepletionRate:0.00}/s");
             sb.Append($"    备用瓶 {FlagText(oxygen.HasAirTank)}\n");
         }
         else

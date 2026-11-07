@@ -20,23 +20,22 @@ public class SwimState : BaseState
 
     public override void UpdateState()
     {
-        // 优先级：死亡 > 冲刺 > 移动/待机
+        // 优先级：死亡 > 移动(冲刺/游泳) > 待机
         if (sm.IsDead)
         {
             sm.SwitchState(sm.deathState);
             return;
         }
 
-        if (sm.DashHeld)
-        {
-            sm.SwitchState(sm.dashState);
-            return;
-        }
-
-        // 无输入计时，超时切待机
         if (sm.HasMoveInput)
         {
             idleTimer = 0;
+            // 移动中按住 Shift 才进入冲刺
+            if (sm.DashHeld)
+            {
+                sm.SwitchState(sm.dashState);
+                return;
+            }
         }
         else
         {
@@ -56,12 +55,13 @@ public class SwimState : BaseState
             sm.ApplyFacing(faceDir);
         }
 
-        // 施加游动力
-        if (sm.MoveDir.sqrMagnitude > 0.01f)
+        // 施加游动力（漂移生效时用漂移方向）
+        Vector2 eff = sm.GetEffectiveMoveDir();
+        if (eff.sqrMagnitude > 0.01f)
         {
             Vector2 moveDir = new Vector2(
-                sm.flipMove ? -sm.MoveDir.x : sm.MoveDir.x,
-                sm.MoveDir.y
+                sm.flipMove ? -eff.x : eff.x,
+                eff.y
             );
             if (moveDir.sqrMagnitude > 1f) moveDir.Normalize();
 

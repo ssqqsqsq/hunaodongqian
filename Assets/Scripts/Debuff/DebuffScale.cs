@@ -28,12 +28,12 @@ public static class AttributeDomain
             case DataType.Nitrogen: min = 0f; max = 30f; return true;
             case DataType.HeartRate: min = 0f; max = 250f; return true;
             case DataType.Depth: min = 0f; max = 100f; return true;
-            case DataType.Oxygen: min = 0f; max = 3600f; return true;
+            case DataType.Oxygen: min = 0f; max = 6000f; return true;
             case DataType.IsDead: min = 0f; max = 1f; return true;
             case DataType.OxygenRate: min = 0f; max = 200f; return true;
             case DataType.CarbonDioxideRate: min = -1000f; max = 1000f; return true;
             case DataType.NitrogenRate: min = -100f; max = 100f; return true;
-            case DataType.CurrentOxygen: min = 0f; max = 1800f; return true;
+            case DataType.CurrentOxygen: min = 0f; max = 3000f; return true;
             default: min = 0f; max = 0f; return false;
         }
     }

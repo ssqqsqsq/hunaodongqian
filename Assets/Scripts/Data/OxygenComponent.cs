@@ -9,6 +9,8 @@ public class OxygenComponent : MonoBehaviour
     [SerializeField] private float oxygenDepletionRateMoving = 20f; // 移动状态下氧气消耗速率（每秒）
     [SerializeField] private float oxygenDepletionRateDashing = 40f; // 冲刺状态下氧气消耗速率（每秒）
     [SerializeField] public bool HasAirTank = true; // 是否还有一瓶未使用的备用气瓶
+    private float spareOxygen; // 备用瓶当前剩余气体（与手持物/功能按钮联动）
+    private float heldTankGas; // 手上气瓶气体（卸下但未丢出时仍计入总气量）
 
     [Header("事件节流")]
     [SerializeField] private float changeEventInterval = 0.1f; // OnOxygenChanged 的最小广播间隔（秒）
@@ -21,7 +23,8 @@ public class OxygenComponent : MonoBehaviour
 
     public event Action<float> OnOxygenChanged; // 氧气值变化，已按 changeEventInterval 节流
     public event Action OnTankSwapped; // 备用气瓶被换上
-    public event Action OnAirSupplyExhausted; // 彻底没气（此时会调用 Kill）
+    public event Action OnAirSupplyExhausted; // 彻底没气（由功能键的憋气/换瓶流程处理死亡）
+    public event Action OnTankEmpty; // 当前气瓶耗尽（不再自动换瓶，由监听方决定后续）
 
     private PlayerSM SM;
 
@@ -35,6 +38,7 @@ public class OxygenComponent : MonoBehaviour
     private void Awake()
     {
         CurrentOxygen = maxOxygen;
+        spareOxygen = maxOxygen;
 
         SM = GetComponent<PlayerSM>();
         if (SM == null)
@@ -71,7 +75,8 @@ public class OxygenComponent : MonoBehaviour
         TickChangedEvent();
     }
 
-    // 消耗氧气：数值夹在 0 以上，烧完一瓶自动换备用瓶
+    // 消耗氧气：数值夹在 0 以上；当前瓶烧完不再自动换瓶 / 立即死亡，
+    // 改为广播 OnTankEmpty，由功能键决定：有备用瓶 → 强制换瓶QTE；只有一个 → 憋气倒计时。
     private void ConsumeOxygen()
     {
         // 死亡后不再消耗，避免死亡瞬间把备用瓶也换掉
@@ -89,30 +94,20 @@ public class OxygenComponent : MonoBehaviour
         // 这一瓶烧完了
         CurrentOxygen = 0f;
 
-        if (HasAirTank)
+        if (!IsOxygenEmpty)
         {
-            // 换上备用瓶：直接充满，并立刻广播一次，让 HUD 及时刷新
-            HasAirTank = false;
-            CurrentOxygen = maxOxygen;
+            IsOxygenEmpty = true;
             changeEventTimer = 0f;
 
-            OnTankSwapped?.Invoke();
             OnOxygenChanged?.Invoke(CurrentOxygen);
-        }
-        else if (!IsOxygenEmpty)
-        {
-            // 没有备用瓶了，真没气：只触发一次
-            IsOxygenEmpty = true;
-
-            OnAirSupplyExhausted?.Invoke();
-            SM?.Kill();
+            OnTankEmpty?.Invoke();
         }
     }
 
-    // 剩余总气量 = 当前瓶 + 备用瓶（备用瓶用过就不算）
+    // 剩余总气量 = 当前瓶 + 备用瓶 + 手上拿着的气瓶
     private void RefreshTotalOxygen()
     {
-        TotalOxygen = CurrentOxygen + (HasAirTank ? maxOxygen : 0f);
+        TotalOxygen = CurrentOxygen + (HasAirTank ? spareOxygen : 0f) + heldTankGas;
     }
 
     // 节流广播：每 changeEventInterval 秒最多广播一次
@@ -154,6 +149,50 @@ public class OxygenComponent : MonoBehaviour
     {
         debuffRateOffset += offset;
         RefreshDepletionRate();
+    }
+
+    // ---- 备用瓶外部接口（手持物 / 功能按钮） ----
+    public float MaxOxygen => maxOxygen;
+    public float SpareOxygen => spareOxygen;
+
+    // 把备用瓶装备回身上（气体由手上气瓶同步）
+    public void SetSpareTank(float gas)
+    {
+        spareOxygen = Mathf.Clamp(gas, 0f, maxOxygen);
+        HasAirTank = true;
+        heldTankGas = 0f; // 装备后不再计入手上
+        RefreshTotalOxygen();
+    }
+
+    // 切换当前使用的气瓶：当前瓶 ↔ 备用瓶互换（换瓶 QTE 成功后调用）
+    public void SwitchTank()
+    {
+        if (!HasAirTank || spareOxygen <= 0f) return;
+
+        float tmp = CurrentOxygen;
+        CurrentOxygen = spareOxygen;
+        spareOxygen = tmp;
+
+        if (CurrentOxygen > 0f) IsOxygenEmpty = false; // 气体恢复，下次耗尽可再次广播
+
+        OnOxygenChanged?.Invoke(CurrentOxygen);
+        RefreshTotalOxygen();
+    }
+
+    // 手上拿着气瓶（卸下的备用瓶在手上时仍计入总气量，丢出后扣除）
+    public void SetHeldTank(float gas)
+    {
+        heldTankGas = Mathf.Clamp(gas, 0f, maxOxygen);
+        RefreshTotalOxygen();
+    }
+
+    // 丢出/投掷手上气瓶：从总气量中扣除
+    public void ClearHeldTank()
+    {
+        if (heldTankGas == 0f) return;
+        heldTankGas = 0f;
+        RefreshTotalOxygen();
+        OnOxygenChanged?.Invoke(CurrentOxygen);
     }
 
     // 实际速率 = 状态基准 + Debuff 偏移，不允许为负（负速率不当作回气用）
