@@ -52,8 +52,8 @@ Material:
     m_Ints: []
     m_Floats:
     - _Ambient_Occlusion: 0
-    - _Edg: -0.79
-    - _Edg_2: 0.9
+    - _Edg: -0.26
+    - _Edg_2: 0.36
     - _Emission: 0
     - _Extra_Noise: 0
     - _Extra_Noise_Density: 5
@@ -70,7 +70,7 @@ Material:
     - _Smoothness: 0
     - _Texture: 0
     m_Colors:
-    - _Color: {r: 0, g: 0.33688784, b: 1, a: 0.039215688}
+    - _Color: {r: 1, g: 1, b: 1, a: 0.14117648}
     - _Direction: {r: 1, g: 0, b: 0, a: 0}
     - _Extra_Noise_Size: {r: 1, g: 1, b: 0, a: 0}
     - _Noise_A_Size: {r: 1, g: 1, b: 0, a: 0}

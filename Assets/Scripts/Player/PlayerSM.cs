@@ -52,6 +52,9 @@ public class PlayerSM : StateMachineBase
     // QTE / 剧情强制锁定：锁定期间忽略全部输入（由 CanalQTEController 设置）
     public bool ControlLocked { get; set; }
 
+    // 当前状态机状态（只读，外部系统根据状态做判定，如泥沙激起强度）
+    public BaseState CurrentState => currentState;
+
     // ControlLocked 期间由外部设置：把身体对齐到该方向（产道 QTE 用）
     public Vector2? ForcedFacingDir { get; set; }
 
