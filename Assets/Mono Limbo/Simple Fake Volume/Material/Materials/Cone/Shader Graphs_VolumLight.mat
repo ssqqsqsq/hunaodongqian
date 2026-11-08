@@ -52,8 +52,13 @@ Material:
     m_Ints: []
     m_Floats:
     - _Ambient_Occlusion: 0
+<<<<<<< Updated upstream
     - _Edg: -0.79
     - _Edg_2: 0.9
+=======
+    - _Edg: -0.12
+    - _Edg_2: 0.36
+>>>>>>> Stashed changes
     - _Emission: 0
     - _Extra_Noise: 0
     - _Extra_Noise_Density: 5
