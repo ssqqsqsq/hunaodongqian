@@ -36,10 +36,10 @@ public class FunctionButtons : MonoBehaviour
     private HandheldController handheld;
 
     private GameObject canvasGo;
-    private Button btn1, btn2, btn3;
-    private Text statusText;
-    private GameObject statusBarGo;
-    private RectTransform statusFillRt;
+    [SerializeField] private Button btn1, btn2, btn3;
+    [SerializeField] private Text statusText;
+    [SerializeField] private GameObject statusBarGo;
+    [SerializeField] private RectTransform statusFillRt;
 
     private bool tankFlowActive;
     private float tankDeadline;
@@ -71,7 +71,27 @@ public class FunctionButtons : MonoBehaviour
 
     private void Awake()
     {
-        BuildUi();
+        bool prebuilt = btn1 != null && btn2 != null && btn3 != null;
+        if (prebuilt)
+        {
+            // 场景里已手动放置技能按钮 → 只接线，不再运行时创建
+            EnsureEventSystem();
+            Wire(btn1, OnButton1);
+            Wire(btn2, OnButton2);
+            Wire(btn3, OnButton3);
+        }
+        else
+        {
+            BuildUi();
+        }
+    }
+
+    private static void Wire(Button b, UnityEngine.Events.UnityAction action)
+    {
+        if (b == null) return;
+        if (b.targetGraphic == null) b.targetGraphic = b.GetComponent<Image>();
+        b.onClick.RemoveListener(action);
+        b.onClick.AddListener(action);
     }
 
     private void Start()
@@ -110,9 +130,9 @@ public class FunctionButtons : MonoBehaviour
         bool hasSpare = oxygen != null && oxygen.HasAirTank;
 
         // 换瓶需要身上有两个气瓶（有备用瓶）才可点
-        btn1.interactable = !busy && !tankFlowActive && hasSpare;
-        btn2.interactable = !busy && !tankFlowActive && flag5;
-        btn3.interactable = !busy && !tankFlowActive && (hasSpare || detaching);
+        if (btn1 != null) btn1.interactable = !busy && !tankFlowActive && hasSpare;
+        if (btn2 != null) btn2.interactable = !busy && !tankFlowActive && flag5;
+        if (btn3 != null) btn3.interactable = !busy && !tankFlowActive && (hasSpare || detaching);
 
         UpdateDetach();
         UpdateBreathHold();
@@ -354,11 +374,14 @@ public class FunctionButtons : MonoBehaviour
             showBar = true;
         }
 
-        statusText.text = msg;
-        statusText.gameObject.SetActive(msg.Length > 0);
+        if (statusText != null)
+        {
+            statusText.text = msg;
+            statusText.gameObject.SetActive(msg.Length > 0);
+        }
 
-        statusBarGo.SetActive(showBar);
-        if (showBar)
+        if (statusBarGo != null) statusBarGo.SetActive(showBar);
+        if (showBar && statusFillRt != null)
         {
             float p = Mathf.Clamp01((Time.time - detachTime) / Mathf.Max(0.01f, detachDuration));
             statusFillRt.sizeDelta = new Vector2(460f * p, 10f);

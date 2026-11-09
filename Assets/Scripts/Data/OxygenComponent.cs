@@ -176,6 +176,7 @@ public class OxygenComponent : MonoBehaviour
         if (CurrentOxygen > 0f) IsOxygenEmpty = false; // 气体恢复，下次耗尽可再次广播
 
         OnOxygenChanged?.Invoke(CurrentOxygen);
+        OnTankSwapped?.Invoke(); // 通知 UI：当前使用的气瓶已切换（1↔2 号瓶）
         RefreshTotalOxygen();
     }
 
